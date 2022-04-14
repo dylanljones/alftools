@@ -1,0 +1,9 @@
+numpy>=1.20.0
+scipy>=1.5.0
+matplotlib>=3.0.0
+numba>=0.50.0
+pytest>=6.0.0
+hypothesis>=6.0.0
+f90nml>=1.3.0
+pprintpp>=0.4.0
+git+https://github.com/DerWeh/gftools@polepade
