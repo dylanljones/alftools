@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# This code is part of alfres.
+# This code is part of alftools.
 #
 # Copyright (c) 2022, Dylan Jones
 
