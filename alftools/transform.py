@@ -64,8 +64,3 @@ def f_iw2z(f_iw, iw, num=1000, eta=1e-6):
     z = np.linspace(-5, 5, num=num) + 1j * eta
     f_z = pade.eval_polefct(z)
     return z, f_z
-
-
-def f_tau2z(f_tau, beta, num=1000, eta=1e-6):
-    iw, f_iw = f_tau2iw(f_tau, beta)
-    return f_iw2z(f_iw, iw, num, eta)

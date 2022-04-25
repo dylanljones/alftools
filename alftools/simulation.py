@@ -8,10 +8,12 @@ import os
 import shutil
 import logging
 import subprocess
-from .config import ALF_DIR
+from .config import conf
 from .parameters import Parameters
 
 logger = logging.getLogger(__name__)
+
+ALF_DIR = conf["alf_dir"]
 
 
 def get_simulation_path(name, root=""):
@@ -77,6 +79,11 @@ def run_simulation(out_dir=""):
     print("Starting simulation")
     print("-" * 90)
     alf_prog = os.path.join(ALF_DIR, "Prog", "ALF.out")
-    subprocess.call([alf_prog, ], cwd=out_dir)
+    subprocess.call(
+        [
+            alf_prog,
+        ],
+        cwd=out_dir,
+    )
     print("-" * 90)
     print("Finished!")

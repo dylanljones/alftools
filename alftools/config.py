@@ -7,8 +7,6 @@
 import os
 from configparser import ConfigParser
 
-ALF_DIR = os.environ["ALF_DIR"]
-
 
 def _read_config(path=""):
     if not path:
@@ -25,3 +23,7 @@ def init_config():
     config["alf_dir"] = paths.get("alf_dir", fallback="") or os.environ["ALF_DIR"]
     config["out"] = paths.get("out_dir", fallback="")
     return config
+
+
+conf = init_config()
+ALF_DIR = conf["alf_dir"]
