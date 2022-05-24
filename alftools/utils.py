@@ -32,6 +32,12 @@ class ParseError(ValueError):
     pass
 
 
+class BinHeaderError(ParseError):
+    def __init__(self, param, obs_name, ibin):
+        msg = f"{param} in bin {ibin} of {obs_name} doesn't match value in info file!"
+        super().__init__(msg)
+
+
 class ComplexParseError(ParseError):
     def __init__(self, string):
         super().__init__(f"complex() arg is a malformed string: {string}")
