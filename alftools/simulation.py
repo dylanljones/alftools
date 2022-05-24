@@ -7,29 +7,18 @@
 import os
 import shutil
 import logging
-import subprocess
-from .config import conf
-from .parameters import Parameters
+from .utils import ALF_DIR, call
 
 logger = logging.getLogger(__name__)
 
-ALF_DIR = conf["alf_dir"]
 
-
-def get_simulation_path(name, root=""):
-    if not root:
-        root = os.path.dirname(os.path.dirname(ALF_DIR))
-    return os.path.join(root, name)
-
-
-def init_simulation_directory(name, root="", overwrite=False):
+def init_simulation_directory(directory, start_dir="Start", overwrite=False):
     """Initializes an empty ALF simulation directory.
 
     Equivalent to the terminal command
-
     .. code-block:: commandline
 
-        cp -r $ALF_DIR/Scripts_and_Parameters_files/Start ./<Name> && cd ./<Name>
+        cp -r $ALF_DIR/Scripts_and_Parameters_files/<Start> ./<Name>
 
     which creates the initial simulation directory storing the default simulation
     parameters. After the simulation is run the results will be saved in this
@@ -37,53 +26,62 @@ def init_simulation_directory(name, root="", overwrite=False):
 
     Parameters
     ----------
-    name : str
-        The name of the ALF output directory that will be created.
-    root : str, optional
-        The directory where the ALF output directory will be created. by default, the
-        root directory of ALF itself is used.
+    directory : str
+        The path of the ALF output directory that will be created.
+    start_dir : str, optional
+        The start directory to copy. The default is the `Start` directory provided by
+        ALF.
     overwrite : bool, optional
         If True any existing directories with the same name will be deleted before
         initializing the new directoy.
-
-    Returns
-    -------
-    out_dir : str
-        The path of the newly created ALF output directory.
     """
-    if not root:
-        root = os.path.dirname(os.path.dirname(ALF_DIR))
-    out_dir = os.path.join(root, name)
-    if overwrite and os.path.exists(out_dir):
-        logger.info("Removing directory %s", out_dir)
-        shutil.rmtree(out_dir)
+    out_dir = os.path.abspath(os.path.normpath(directory))
+    if os.path.exists(out_dir):
+        if overwrite:
+            logger.info("Removing directory %s", out_dir)
+            shutil.rmtree(out_dir)
+        else:
+            logger.info("Directory already exists: %s", out_dir)
+            return
     logger.info("Creating initial simulation directory: %s", out_dir)
-    src_dir = os.path.join(ALF_DIR, "Scripts_and_Parameters_files", "Start")
+    src_dir = os.path.join(ALF_DIR, "Scripts_and_Parameters_files", start_dir)
     shutil.copytree(src_dir, out_dir)
-    return out_dir
 
 
-def init_simulation(name, root="", overwrite=False):
-    out_dir = init_simulation_directory(name, root, overwrite)
-    params = Parameters(out_dir)
-    return out_dir, params
+def out_to_in(directory, verbose=True):
+    """Converts the output configuration to an input configuration.
+
+    Equivalent to the terminal command
+    .. code-block:: commandline
+
+        ./out_to_in.sh
+
+    Parameters
+    ----------
+    directory : str
+        The path of an existing ALF simualtion directory.
+    verbose : bool, optional
+        If True, print the output of the command.
+    """
+    logger.info("Running 'out_to_in.sh' in '%s'", directory)
+    # Run `out_to_in` Script
+    call("./out_to_in.sh", cwd=directory, verbose=verbose)
 
 
-def load_simulation(name, root=""):
-    out_dir = get_simulation_path(name, root)
-    params = Parameters(out_dir)
-    return out_dir, params
+def run_simulation(directory, verbose=True):
+    """Runs a new or continued ALF simulation
 
+    Equivalent to the terminal command
+    .. code-block:: commandline
 
-def run_simulation(out_dir=""):
-    print("Starting simulation")
-    print("-" * 90)
-    alf_prog = os.path.join(ALF_DIR, "Prog", "ALF.out")
-    subprocess.call(
-        [
-            alf_prog,
-        ],
-        cwd=out_dir,
-    )
-    print("-" * 90)
-    print("Finished!")
+        $ALF_DIR/Prog/ALF.out
+
+    Parameters
+    ----------
+    directory : str
+        The path of an initialized ALF simualtion directory.
+    verbose : bool, optional
+        If True, print the output of the command.
+    """
+    logger.info("Running simulation in '%s'", directory)
+    call(os.path.join(ALF_DIR, "Prog", "ALF.out"), cwd=directory, verbose=verbose)
