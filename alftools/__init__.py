@@ -6,5 +6,5 @@
 
 from .utils import ALF_DIR, logger, call
 from .parameters import Parameters
-from .simulation import init_simulation_directory, run_simulation, out_to_in
+from .simulation import init_simulation, run_simulation, out_to_in
 from .analysis import read_data_tau, read_gftau

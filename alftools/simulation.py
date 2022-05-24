@@ -12,7 +12,7 @@ from .utils import ALF_DIR, call
 logger = logging.getLogger(__name__)
 
 
-def init_simulation_directory(directory, start_dir="Start", overwrite=False):
+def init_simulation(directory, start_dir="Start", overwrite=False):
     """Initializes an empty ALF simulation directory.
 
     Equivalent to the terminal command
