@@ -69,12 +69,15 @@ def out_to_in(directory, verbose=True):
 
 
 def run_simulation(directory, verbose=True):
-    """Runs a new or continued ALF simulation
+    """Runs a new or continued ALF simulation.
 
     Equivalent to the terminal command
     .. code-block:: commandline
 
         $ALF_DIR/Prog/ALF.out
+
+    If an existing simulation is continued the method `out_to_in` has to be called
+    before running this method.
 
     Parameters
     ----------
