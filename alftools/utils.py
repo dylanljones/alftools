@@ -4,7 +4,28 @@
 #
 # Copyright (c) 2022, Dylan Jones
 
+import os
+import logging
 import numpy as np
+
+ALF_DIR = os.environ["ALF_DIR"]
+
+
+logger = logging.getLogger(__name__.split(".")[0])
+
+# Logging format
+frmt = "[%(asctime)s] %(name)s:%(levelname)-8s - %(message)s"
+formatter = logging.Formatter(frmt, datefmt="%H:%M:%S")
+
+# Set up console logger
+sh = logging.StreamHandler()
+sh.setLevel(logging.DEBUG)
+sh.setFormatter(formatter)
+logger.addHandler(sh)
+
+# Set logging level
+logger.setLevel(logging.INFO)
+logging.root.setLevel(logging.NOTSET)
 
 
 class ParseError(ValueError):
@@ -12,9 +33,20 @@ class ParseError(ValueError):
 
 
 class ComplexParseError(ParseError):
-
     def __init__(self, string):
         super().__init__(f"complex() arg is a malformed string: {string}")
+
+
+def call(cmd, cwd=None, verbose=False):
+    old_cwd = ""
+    if cwd:
+        old_cwd = os.getcwd()
+        os.chdir(cwd)
+    if not verbose:
+        cmd += " > /dev/null"
+    os.system(cmd)
+    if cwd:
+        os.chdir(old_cwd)
 
 
 def string_to_number(string):
