@@ -21,6 +21,14 @@ from .utils import (
 logger = logging.getLogger(__name__)
 
 
+def contains_analysis(directory):
+    for name in os.listdir(directory):
+        path = os.path.join(directory, name)
+        if os.path.isdir(path):
+            return True
+    return False
+
+
 def run_analysis(directory, files="*", verbose=True):
     """Runs the ALF analysis program.
 
