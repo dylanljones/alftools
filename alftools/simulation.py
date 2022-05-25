@@ -8,6 +8,8 @@ import os
 import shutil
 import logging
 from .utils import ALF_DIR, call
+from .parameters import Parameters
+from .analysis import run_analysis
 
 logger = logging.getLogger(__name__)
 
@@ -102,3 +104,23 @@ def run_simulation(directory, verbose=True):
     """
     logger.info("Running simulation in '%s'", directory)
     call(os.path.join(ALF_DIR, "Prog", "ALF.out"), cwd=directory, verbose=verbose)
+
+
+class Simulation:
+
+    def __init__(self, directory):
+        self.directory = directory
+        self.parameters = None
+
+    def init(self, start_dir="", overwrite=False):
+        init_simulation(self.directory, start_dir, overwrite)
+        self.parameters = Parameters(self.directory)
+
+    def run(self, verbose=True):
+        run_simulation(self.directory, verbose)
+
+    def out_to_in(self, verbose=True):
+        out_to_in(self.directory, verbose)
+
+    def analyze(self, files="*", verbose=True):
+        run_analysis(self.directory, files, verbose)
