@@ -12,7 +12,18 @@ from .utils import ALF_DIR, call
 logger = logging.getLogger(__name__)
 
 
-def init_simulation(directory, start_dir="Start", overwrite=False):
+def _check_initialized(directory):
+    if not os.path.exists(directory):
+        return False
+    files = list(os.listdir(directory))
+    expected = ["parameters", "seeds", "out_to_in.sh"]
+    for name in expected:
+        if name not in files:
+            return False
+    return True
+
+
+def init_simulation(directory, start_dir="", overwrite=False):
     """Initializes an empty ALF simulation directory.
 
     Equivalent to the terminal command
@@ -35,8 +46,11 @@ def init_simulation(directory, start_dir="Start", overwrite=False):
         If True any existing directories with the same name will be deleted before
         initializing the new directoy.
     """
+    if not start_dir:
+        start_dir = "Start"
+
     out_dir = os.path.abspath(os.path.normpath(directory))
-    if os.path.exists(out_dir):
+    if _check_initialized(out_dir):
         if overwrite:
             logger.info("Removing directory %s", out_dir)
             shutil.rmtree(out_dir)
