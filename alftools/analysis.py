@@ -236,7 +236,13 @@ def read_green_tau(directory, total=True):
     # Remove orbs
     gf_tau = gf_tau[:, 0, 0]
     # Normalize data
-    gf_tau = gf_tau / (info["ncells"] * info["norbs"])
+    gf_tau = -gf_tau / (info["ncells"] * info["norbs"])
     if total:
         gf_tau = np.sum(gf_tau, axis=-1)
-    return tau, gf_tau
+    return info, tau, gf_tau.real
+
+
+def read_greens_kspace(root):
+    path = os.path.join(root, "Green")
+    data = np.loadtxt(path, usecols=(1, 2, 3))
+    return data.T
