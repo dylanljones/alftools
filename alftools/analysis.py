@@ -5,6 +5,7 @@
 # Copyright (c) 2022, Dylan Jones
 
 import os
+import re
 import logging
 import itertools
 import numpy as np
@@ -27,6 +28,15 @@ def contains_analysis(directory):
         if os.path.isdir(path):
             return True
     return False
+
+
+def get_kspace_dirs(directory, obs_name):
+    regex = re.compile(obs_name + r"_\d+\.\d{2}_\d+\.\d{2}")
+    names = list()
+    for name in os.listdir(directory):
+        if regex.match(name):
+            names.append(name)
+    return names
 
 
 def run_analysis(directory, files="*", verbose=True):
