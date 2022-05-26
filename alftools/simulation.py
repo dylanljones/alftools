@@ -132,3 +132,9 @@ class Simulation:
                 self.parameters.set("var_" + sec, key, val)
         if save:
             self.parameters.save()
+
+    def listdir(self):
+        return os.listdir(self.directory)
+
+    def join(self, *args):
+        return os.path.join(self.directory, *args)
