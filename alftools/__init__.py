@@ -6,7 +6,7 @@
 
 from .utils import ALF_DIR, logger, call
 from .parameters import Parameters
-from .simulation import init_simulation, run_simulation, out_to_in
+from .simulation import Simulation
 
 
 try:

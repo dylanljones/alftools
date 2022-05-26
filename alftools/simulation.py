@@ -7,6 +7,7 @@
 import os
 import shutil
 import logging
+from typing import Union
 from .utils import ALF_DIR, call
 from .parameters import Parameters
 from .analysis import run_analysis
@@ -107,10 +108,10 @@ def run_simulation(directory, verbose=True):
 
 
 class Simulation:
-
-    def __init__(self, directory):
+    def __init__(self, directory, start_dir="", overwrite=False):
         self.directory = directory
-        self.parameters = None
+        self.parameters: Union[Parameters, None] = None
+        self.init(start_dir, overwrite)
 
     def init(self, start_dir="", overwrite=False):
         init_simulation(self.directory, start_dir, overwrite)
@@ -124,3 +125,10 @@ class Simulation:
 
     def analyze(self, files="*", verbose=True):
         run_analysis(self.directory, files, verbose)
+
+    def update_params(self, data, save=False):
+        for sec, items in data.items():
+            for key, val in items.items():
+                self.parameters.set("var_" + sec, key, val)
+        if save:
+            self.parameters.save()
