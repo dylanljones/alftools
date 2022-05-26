@@ -8,7 +8,7 @@ import os
 import logging
 import numpy as np
 
-ALF_DIR = os.environ["ALF_DIR"]
+ALF_DIR = os.environ.get("ALF_DIR", None)
 
 
 logger = logging.getLogger(__name__.split(".")[0])
