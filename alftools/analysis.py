@@ -177,7 +177,16 @@ def subtract_background(values, backs, ncells):
             values[:, orb2, orb1, tau, n] -= ncells * backs[:, orb2] * backs[:, orb1]
 
 
-def read_data_tau(directory, obs_name, nrebin=0, nskip=0, subtract_back=True):
+def subtract_background_mat(values, backs, ncells):
+    n = 0  # latt.invlistk[0, 0]
+    norbs = values.shape[1]
+    ntau = values.shape[3]
+    for orb1, orb2 in itertools.product(range(norbs), repeat=2):
+        for tau in range(ntau):
+            values[:, orb2, orb1, tau, n, n] -= ncells * backs[:, orb2] * backs[:, orb1]
+
+
+def read_data_latt(directory, obs_name, nrebin=0, nskip=0, subtract_back=True):
     info = read_info(directory, obs_name + "_info")
     ntau = info["ntau"]
     ncells = info["ncells"]
@@ -215,10 +224,12 @@ def read_data_tau(directory, obs_name, nrebin=0, nskip=0, subtract_back=True):
             raise BinHeaderError("norbs", obs_name, ibin)
         if int(header[2]) != ncells:
             raise BinHeaderError("ncells", obs_name, ibin)
-        if int(header[3]) != ntau:
-            raise BinHeaderError("ntau", obs_name, ibin)
-        if float(header[4]) != dtau:
-            raise BinHeaderError("dtau", obs_name, ibin)
+        if len(header) > 3:
+            # obs_tau
+            if int(header[3]) != ntau:
+                raise BinHeaderError("ntau", obs_name, ibin)
+            if float(header[4]) != dtau:
+                raise BinHeaderError("dtau", obs_name, ibin)
         i += 1
 
         # First `norbs` lines for background
@@ -228,10 +239,8 @@ def read_data_tau(directory, obs_name, nrebin=0, nskip=0, subtract_back=True):
 
         # Parse main data
         for icell in range(ncells):
-            # What is this line??? (without braces)
-            # line = lines[i]
-            # val1, val2 = [_string_to_number(s) for s in line.split()]
-            # print(val1, val2)
+            # K-Point (without braces)
+            # kx, ky = [_string_to_number(s) for s in lines[i].split()]
             i += 1
             for itau in range(ntau):
                 for orb1, orb2 in itertools.product(range(norbs), repeat=2):
@@ -254,8 +263,90 @@ def read_data_tau(directory, obs_name, nrebin=0, nskip=0, subtract_back=True):
     return info, tau, values, signs
 
 
+def read_data_mat(directory, obs_name, nrebin=0, nskip=0, subtract_back=True):
+    info = read_info(directory, obs_name + "_info")
+    ntau = info["ntau"]
+    ncells = info["ncells"]
+    norbs = info["norbs"]
+    dtau = info["dtau"]
+
+    # Read lines of the output file
+    path = os.path.join(directory, obs_name)
+    with open(path, "r") as fh:
+        data = fh.read()
+    lines = data.splitlines()
+
+    # Sanity check of line numbers
+    num_elements = ncells ** 2 * norbs**2 * (1 + ntau)
+    num_bins0 = len(lines) / (1 + norbs + num_elements)
+    num_bins = int(round(num_bins0))
+    if abs(num_bins0 - num_bins) > 1e-10:
+        raise ParseError(
+            f"Error in reading data: File '{path}', line number does not fit!"
+            "Did you forget to clear the output-dir before re-running the simulation?"
+        )
+
+    # Initialize output arrays for the data, signs and backgrounds
+    values = np.zeros(
+        (num_bins, norbs, norbs, ntau, ncells, ncells), dtype=np.complex128
+    )
+    signs = np.zeros(num_bins, dtype=np.int8)
+    backs = np.zeros((num_bins, norbs), dtype=np.complex128)
+
+    # Parse output file
+    i = 0
+    for ibin in range(num_bins):
+        # Parse header line
+        header = lines[i].split()
+        signs[ibin] = float(header[0])
+        # Check bin parameters
+        if int(header[1]) != norbs:
+            raise BinHeaderError("norbs", obs_name, ibin)
+        if int(header[2]) != ncells:
+            raise BinHeaderError("ncells", obs_name, ibin)
+        if len(header) > 3:
+            # obs_tau
+            if int(header[3]) != ntau:
+                raise BinHeaderError("ntau", obs_name, ibin)
+            if float(header[4]) != dtau:
+                raise BinHeaderError("dtau", obs_name, ibin)
+        i += 1
+
+        # First `norbs` lines for background
+        for iorb in range(norbs):
+            backs[ibin, iorb] = csv_to_complex(lines[i])
+            i += 1
+
+        # Parse main data
+        for icell in range(ncells):
+            for jcell in range(ncells):
+                line = lines[i]
+                i1, i2 = [int(s) - 1 for s in line.split()]
+                i += 1
+                for itau in range(ntau):
+                    for orb1, orb2 in itertools.product(range(norbs), repeat=2):
+                        line = lines[i]
+                        try:
+                            val = csv_to_complex(line)
+                            values[ibin, orb1, orb2, itau, i1, i2] = val
+                        except ValueError:
+                            raise ComplexParseError(lines[i])
+                        i += 1
+
+    if nrebin and nskip:
+        values = jack(values, nrebin, nskip)
+        backs = jack(backs, nrebin, nskip)
+        signs = jack(signs, nrebin, nskip)
+
+    if subtract_back:
+        subtract_background_mat(values, backs, ncells)
+
+    tau = np.arange(info["ntau"]) * info["dtau"]
+    return info, tau, values, signs
+
+
 def read_green_tau(directory, total=True):
-    info, tau, gf_tau, signs = read_data_tau(directory, "Green_tau")
+    info, tau, gf_tau, signs = read_data_latt(directory, "Green_tau")
     # Remove orbs
     gf_tau = gf_tau[:, 0, 0]
     # Normalize data
