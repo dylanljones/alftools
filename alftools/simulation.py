@@ -10,7 +10,15 @@ import logging
 from typing import Union
 from .utils import ALF_DIR, call
 from .parameters import Parameters
-from .analysis import run_analysis
+from .analysis import (
+    run_analysis,
+    read_data_latt,
+    read_data_mat,
+    read_green_eq,
+    read_green_tau,
+    read_greenmat_eq,
+    read_greenmat_tau,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -108,10 +116,9 @@ def run_simulation(directory, verbose=True):
 
 
 class Simulation:
-    def __init__(self, directory, start_dir="", overwrite=False):
+    def __init__(self, directory):
         self.directory = directory
         self.parameters: Union[Parameters, None] = None
-        self.init(start_dir, overwrite)
 
     def init(self, start_dir="", overwrite=False):
         init_simulation(self.directory, start_dir, overwrite)
@@ -138,3 +145,21 @@ class Simulation:
 
     def join(self, *args):
         return os.path.join(self.directory, *args)
+
+    def read_obs_latt(self, obs_name, nrebin=None, nskip=None, subtract_back=True):
+        return read_data_latt(self.directory, obs_name, nrebin, nskip, subtract_back)
+
+    def read_obs_mat(self, obs_name, nrebin=None, nskip=None, subtract_back=True):
+        return read_data_mat(self.directory, obs_name, nrebin, nskip, subtract_back)
+
+    def read_green_eq(self, iorb=0, nrebin=None, nskip=None):
+        return read_green_eq(self.directory, iorb, nrebin, nskip)
+
+    def read_green_tau(self, iorb=0, total=False, nrebin=None, nskip=None):
+        return read_green_tau(self.directory, iorb, total, nrebin, nskip)
+
+    def read_greenmat_eq(self, iorb=0, nrebin=None, nskip=None):
+        return read_greenmat_eq(self.directory, iorb, nrebin, nskip)
+
+    def read_greenmat_tau(self, iorb=0, total=False, nrebin=None, nskip=None):
+        return read_greenmat_tau(self.directory, iorb, total, nrebin, nskip)
