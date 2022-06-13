@@ -435,13 +435,12 @@ def read_data_mat(directory, obs_name, nrebin=None, nskip=None, subtract_back=Tr
         values = jacknife_bins(values, nrebin, nskip)
         backs = jacknife_bins(backs, nrebin, nskip)
         signs = jacknife_bins(signs, nrebin, nskip)
-    if subtract_back:
-        subtract_background(values, backs, ncells)
+
     if subtract_back:
         subtract_background_mat(values, backs, ncells)
 
     tau = np.arange(info["ntau"]) * info["dtau"]
-    return info, tau, values, signs
+    return tau, values, signs, info
 
 
 # == Green's functions =================================================================
