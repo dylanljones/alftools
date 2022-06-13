@@ -10,12 +10,13 @@ import shutil
 from collections import abc
 
 
-class Parameters(abc.Mapping):
-    def __init__(self, root_or_path):
-        if os.path.isdir(root_or_path):
-            root_or_path = os.path.join(root_or_path, "parameters")
-        self._path = root_or_path
+class F90nml(abc.Mapping):
+    """Fortran parameter file handler."""
+
+    def __init__(self, path, autosave=False):
+        self._path = path
         self._nml = f90nml.read(self._path)
+        self._autosave = autosave
 
     def __len__(self):
         return len(self._nml)
@@ -46,6 +47,8 @@ class Parameters(abc.Mapping):
 
     def set(self, section, key, value):
         self._nml[section][key] = value
+        if self._autosave:
+            self.save()
 
     def save(self, name=""):
         if name:
@@ -58,6 +61,13 @@ class Parameters(abc.Mapping):
 
     def __str__(self):
         return str(self._nml)
+
+
+class Parameters(F90nml):
+    def __init__(self, root_or_path, autosave=False):
+        if os.path.isdir(root_or_path):
+            root_or_path = os.path.join(root_or_path, "parameters")
+        super().__init__(root_or_path, autosave)
 
     # -- Getters -----------------------------------------------------------------------
 
