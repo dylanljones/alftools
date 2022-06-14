@@ -2,8 +2,21 @@
 
 alftools is an alternative to the [pyalf] package provided by the [ALF] team.
 
+## 🔧 Installation
 
-## Running simulations
+Install via `pip` from github:
+```commandline
+pip install git+https://github.com/dylanljones/alftools.git@VERSION
+```
+
+or download/clone the package, navigate to the root directory and install via
+````commandline
+pip install .
+````
+
+## 🚀 Quick-Start
+
+### Running simulations
 
 A new sdimulation can be run in a few steps:
 ```python
