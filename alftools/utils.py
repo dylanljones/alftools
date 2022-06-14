@@ -8,9 +8,6 @@ import os
 import logging
 import numpy as np
 
-ALF_DIR = os.environ.get("ALF_DIR", None)
-
-
 logger = logging.getLogger(__name__.split(".")[0])
 
 # Logging format
@@ -26,6 +23,15 @@ logger.addHandler(sh)
 # Set logging level
 logger.setLevel(logging.INFO)
 logging.root.setLevel(logging.NOTSET)
+
+
+conf = dict()
+conf["ALF_DIR"] = os.environ.get("ALF_DIR", None)
+
+
+def update_alf_dir(path):
+    global conf
+    conf["ALF_DIR"] = path
 
 
 class ParseError(ValueError):
@@ -150,3 +156,9 @@ def csv_to_complex(s):
         return complex(s_frmt)
     except ValueError:
         raise ComplexParseError(s_frmt)
+
+
+def errorfill(ax, x, y, yerr, alpha=0.2, **kwargs):
+    line = ax.plot(x, y, **kwargs)[0]
+    ax.fill_between(x, y - yerr, y + yerr, color=line.get_color(), alpha=alpha)
+    return line

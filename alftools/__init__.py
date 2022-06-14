@@ -4,7 +4,7 @@
 #
 # Copyright (c) 2022, Dylan Jones
 
-from .utils import ALF_DIR, logger, call
+from .utils import conf, logger, call, update_alf_dir
 from .parameters import Parameters
 from .simulation import Simulation
 

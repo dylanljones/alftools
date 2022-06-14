@@ -7,7 +7,7 @@
 import os
 import shutil
 import logging
-from .utils import ALF_DIR, call
+from .utils import conf, call
 
 logger = logging.getLogger(__name__)
 
@@ -35,5 +35,5 @@ def run_maxent(directory, name, verbose=False):
 
     # Run MaxEnt
     logger.info("Running Max_SAC in %s", path)
-    cmd = os.path.join(ALF_DIR, "Analysis", "Max_SAC.out")
+    cmd = os.path.join(conf["ALF_DIR"], "Analysis", "Max_SAC.out")
     call(cmd, path, verbose)

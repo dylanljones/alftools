@@ -11,7 +11,7 @@ import itertools
 import numpy as np
 from .parameters import Parameters
 from .utils import (
-    ALF_DIR,
+    conf,
     ComplexParseError,
     BinHeaderError,
     ParseError,
@@ -58,11 +58,11 @@ def run_analysis(directory, files="*", verbose=True):
         If True, print the output of the command.
     """
     if os.path.exists(os.path.join(directory, "data.h5")):
-        cmd = os.path.join(ALF_DIR, "Analysis", "ana_hdf5.out")
+        cmd = os.path.join(conf["ALF_DIR"], "Analysis", "ana_hdf5.out")
         if files != "*":
             cmd += " " + files
     else:
-        cmd = os.path.join(ALF_DIR, "Analysis", "ana.out") + " " + files
+        cmd = os.path.join(conf["ALF_DIR"], "Analysis", "ana.out") + " " + files
     logger.info("Running Analysis in %s: %s", directory, cmd)
     call(cmd, cwd=os.path.normpath(directory), verbose=verbose)
 

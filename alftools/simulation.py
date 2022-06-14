@@ -8,7 +8,7 @@ import os
 import shutil
 import logging
 from typing import Union
-from .utils import ALF_DIR, call
+from .utils import conf, call
 from .parameters import Parameters
 from .analysis import (
     run_analysis,
@@ -69,7 +69,7 @@ def init_simulation(directory, start_dir="", overwrite=False):
             logger.info("Directory already exists: %s", out_dir)
             return
     logger.info("Creating initial simulation directory: %s", out_dir)
-    src_dir = os.path.join(ALF_DIR, "Scripts_and_Parameters_files", start_dir)
+    src_dir = os.path.join(conf["ALF_DIR"], "Scripts_and_Parameters_files", start_dir)
     shutil.copytree(src_dir, out_dir)
 
 
@@ -112,17 +112,25 @@ def run_simulation(directory, verbose=True):
         If True, print the output of the command.
     """
     logger.info("Running simulation in '%s'", directory)
-    call(os.path.join(ALF_DIR, "Prog", "ALF.out"), cwd=directory, verbose=verbose)
+    cmd = os.path.join(conf["ALF_DIR"], "Prog", "ALF.out")
+    call(cmd, cwd=directory, verbose=verbose)
 
 
 class Simulation:
     def __init__(self, directory):
         self.directory = directory
         self.parameters: Union[Parameters, None] = None
+        try:
+            self.load_parameters()
+        except FileNotFoundError:
+            pass
+
+    def load_parameters(self):
+        self.parameters = Parameters(self.directory)
 
     def init(self, start_dir="", overwrite=False):
         init_simulation(self.directory, start_dir, overwrite)
-        self.parameters = Parameters(self.directory)
+        self.load_parameters()
 
     def run(self, verbose=True):
         run_simulation(self.directory, verbose)
