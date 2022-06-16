@@ -51,8 +51,9 @@ def init_simulation(directory, start_dir="", overwrite=False):
     directory : str
         The path of the ALF output directory that will be created.
     start_dir : str, optional
-        The start directory to copy. The default is the `Start` directory provided by
-        ALF.
+        The start directory to copy. Can be a name of the directories provided by ALF
+        or a path to a custom start directory. The default is the `Start` directory
+        provided by ALF.
     overwrite : bool, optional
         If True any existing directories with the same name will be deleted before
         initializing the new directoy.
@@ -69,7 +70,11 @@ def init_simulation(directory, start_dir="", overwrite=False):
             logger.info("Directory already exists: %s", out_dir)
             return
     logger.info("Creating initial simulation directory: %s", out_dir)
-    src_dir = os.path.join(conf["ALF_DIR"], "Scripts_and_Parameters_files", start_dir)
+    base, name = os.path.split(start_dir)
+    if not base:
+        src_dir = os.path.join(conf["ALF_DIR"], "Scripts_and_Parameters_files", start_dir)
+    else:
+        src_dir = start_dir
     shutil.copytree(src_dir, out_dir)
 
 
