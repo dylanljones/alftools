@@ -476,7 +476,7 @@ def read_green_eq(directory, iorb=0, nrebin=None, nskip=None):
     # Normalize data
     gf_eq = -gf_eq / (info["ncells"] * info["norbs"])
     errs = error(gf_eq)
-    return gf_eq.real, errs, info
+    return gf_eq, errs, info
 
 
 def read_green_tau(directory, iorb=0, total=False, nrebin=None, nskip=None):
@@ -512,7 +512,7 @@ def read_green_tau(directory, iorb=0, total=False, nrebin=None, nskip=None):
         gf_tau = np.sum(gf_tau, axis=-1)
 
     errs = error(gf_tau)
-    return tau, gf_tau.real, errs, info
+    return tau, gf_tau, errs, info
 
 
 def read_greenmat_eq(directory, iorb=0, nrebin=None, nskip=None):
@@ -546,7 +546,7 @@ def read_greenmat_eq(directory, iorb=0, nrebin=None, nskip=None):
     gf_eq = -gf_eq / (info["ncells"] * info["norbs"])
 
     errs = error(gf_eq)
-    return gf_eq.real, errs, info
+    return gf_eq, errs, info
 
 
 def read_greenmat_tau(directory, iorb=0, total=False, nrebin=None, nskip=None):
@@ -581,7 +581,7 @@ def read_greenmat_tau(directory, iorb=0, total=False, nrebin=None, nskip=None):
     if total:
         gf_tau = np.trace(gf_tau, axis1=-2, axis2=-1)
     errs = error(gf_tau)
-    return tau, gf_tau.real, errs, info
+    return tau, gf_tau, errs, info
 
 
 def read_mean_tau(directory, obs_name):
