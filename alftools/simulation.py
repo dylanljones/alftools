@@ -72,7 +72,9 @@ def init_simulation(directory, start_dir="", overwrite=False):
     logger.info("Creating initial simulation directory: %s", out_dir)
     base, name = os.path.split(start_dir)
     if not base:
-        src_dir = os.path.join(conf["ALF_DIR"], "Scripts_and_Parameters_files", start_dir)
+        src_dir = os.path.join(
+            conf["ALF_DIR"], "Scripts_and_Parameters_files", start_dir
+        )
     else:
         src_dir = start_dir
     shutil.copytree(src_dir, out_dir)
