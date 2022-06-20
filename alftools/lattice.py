@@ -11,7 +11,7 @@ import lattpy as lp
 LATTICE_BASIS = {
     "Chain": lp.Lattice.chain,
     "Square": lp.Lattice.square,
-    "Cube": lp.Lattice.sc
+    "Cube": lp.Lattice.sc,
 }
 
 
