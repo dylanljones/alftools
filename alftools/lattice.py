@@ -7,7 +7,6 @@
 import numpy as np
 import lattpy as lp
 
-
 LATTICE_BASIS = {
     "Chain": lp.Lattice.chain,
     "Square": lp.Lattice.square,
